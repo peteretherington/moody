@@ -15,7 +15,7 @@
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "webpack-dev-server --mode development --hot --progress --color --port 3000 --open",
     "build": "webpack -p --progress --colors",
     "prettier": "prettier --write \"src/**/*.{ts,tsx,css}\""
@@ -36,10 +36,12 @@
     "babel-loader": "^8.0.5",
     "clean-webpack-plugin": "^2.0.1",
     "css-loader": "^2.1.0",
+    "enzyme": "^3.10.0",
     "file-loader": "^3.0.1",
     "gh-pages": "^2.0.1",
     "html-loader": "^1.0.0-alpha.0",
     "html-webpack-plugin": "^4.0.0-alpha",
+    "jest": "^24.9.0",
     "mini-css-extract-plugin": "^0.5.0",
     "postcss": "^7.0.13",
     "postcss-browser-reporter": "^0.5.0",
