@@ -6,6 +6,9 @@ import { configureStore } from 'app/store';
 import { Router } from 'react-router';
 import { App } from './app';
 
+// hot reloading
+module.hot && module.hot.accept();
+
 // prepare store
 const history = createBrowserHistory();
 const store = configureStore();
@@ -16,5 +19,5 @@ ReactDOM.render(
       <App />
     </Router>
   </Provider>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
