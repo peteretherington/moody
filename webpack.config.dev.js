@@ -13,15 +13,15 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   context: sourcePath,
-  mode: 'production',
+  mode: 'development',
   entry: {
-    app: './main.tsx',
+    app: ['webpack-hot-middleware/client?path=/__webpack_hmr&timeout=20000', './main.tsx'],
   },
   output: {
     path: outPath,
     publicPath: '/',
-    filename: '[contenthash].js',
-    chunkFilename: '[name].[contenthash].js',
+    filename: '[hash].js',
+    chunkFilename: '[name].[hash].js',
   },
   target: 'web',
   resolve: {
@@ -38,20 +38,26 @@ module.exports = {
       // .ts, .tsx
       {
         test: /\.tsx?$/,
-        use: ['ts-loader'],
+        use: [
+          {
+            loader: 'babel-loader',
+            options: { plugins: ['react-hot-loader/babel'] }, // Needed as well as webpack-hot-middleware ???
+          },
+          'ts-loader',
+        ],
       },
       // css
       {
         test: /\.css$/,
         use: [
-          MiniCssExtractPlugin.loader,
+          'style-loader',
           {
             loader: 'css-loader',
             query: {
               modules: true,
-              sourceMap: false,
+              sourceMap: true,
               importLoaders: 1,
-              localIdentName: '[hash:base64:5]',
+              localIdentName: '[local]__[hash:base64:5]',
             },
           },
           {
@@ -67,7 +73,7 @@ module.exports = {
                 }),
                 require('postcss-reporter')(),
                 require('postcss-browser-reporter')({
-                  disabled: true,
+                  disabled: false,
                 }),
               ],
             },
@@ -94,7 +100,7 @@ module.exports = {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
           chunks: 'all',
-          filename: 'vendor.[contenthash].js',
+          filename: 'vendor.[hash].js',
           priority: -10,
         },
       },
@@ -103,13 +109,14 @@ module.exports = {
   },
   plugins: [
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production',
+      NODE_ENV: 'development', // use 'development' unless process.env.NODE_ENV is defined
       DEBUG: false,
     }),
+    new webpack.HotModuleReplacementPlugin(),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: '[hash].css',
-      disable: false,
+      disable: true,
     }),
     new HtmlWebpackPlugin({
       template: 'assets/index.html',
@@ -131,6 +138,27 @@ module.exports = {
       },
     }),
   ],
+  devServer: {
+    contentBase: sourcePath,
+    hot: true,
+    inline: true,
+    historyApiFallback: {
+      disableDotRule: true,
+    },
+    stats: 'minimal',
+    clientLogLevel: 'warning',
+    overlay: {
+      // Shows a full-screen overlay in the browser when there are compiler errors or warnings
+      warnings: true, // default false
+      errors: true, //default false
+    },
+  },
   // https://webpack.js.org/configuration/devtool/
-  devtool: 'hidden-source-map',
+  devtool: 'cheap-module-eval-source-map',
+  node: {
+    // workaround for webpack-dev-server issue
+    // https://github.com/webpack/webpack-dev-server/issues/60#issuecomment-103411179
+    fs: 'empty',
+    net: 'empty',
+  },
 };
