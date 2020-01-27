@@ -20,6 +20,7 @@ const { NODE_ENV, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI, PORT } = process.env;
 const client_id = CLIENT_ID;
 const client_secret = CLIENT_SECRET;
 const redirect_uri = REDIRECT_URI;
+
 const stateKey = 'spotify_auth_state';
 const outPath = path.join(__dirname, '../../build');
 
@@ -97,7 +98,7 @@ app.get('/callback', (req, res) => {
         grant_type: 'authorization_code',
       },
       headers: {
-        Authorization: `Basic${new Buffer(`${client_id}:${client_secret}`).toString('base64')}`,
+        Authorization: 'Basic ' + new Buffer.from(`${client_id}:${client_secret}`).toString('base64'),
       },
       json: true,
     };
@@ -108,7 +109,7 @@ app.get('/callback', (req, res) => {
 
         const options = {
           url: 'https://api.spotify.com/v1/me',
-          headers: { Authorization: `Bearer${access_token}` },
+          headers: { Authorization: 'Bearer ' + access_token },
           json: true,
         };
 
@@ -141,7 +142,7 @@ app.get('/refresh_token', (req, res) => {
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: {
-      Authorization: `Basic${new Buffer(`${client_id}:${client_secret}`).toString('base64')}`,
+      Authorization: 'Basic ' + new Buffer.from(`${client_id}:${client_secret}`).toString('base64'),
     },
     form: {
       grant_type: 'refresh_token',
@@ -153,9 +154,7 @@ app.get('/refresh_token', (req, res) => {
   request.post(authOptions, (error, { statusCode }, body) => {
     if (!error && statusCode === 200) {
       const { access_token } = body;
-      res.send({
-        access_token,
-      });
+      res.send({ access_token });
     }
   });
 });
