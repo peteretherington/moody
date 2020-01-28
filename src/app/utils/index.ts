@@ -9,3 +9,15 @@ export function omit<T extends object, K extends keyof T>(target: T, ...omitKeys
     {} as any
   );
 }
+
+/**
+ * Obtains parameters from the hash of the URL
+ * @return Object
+ */
+export const getHashParams = () => {
+  const hash = new URLSearchParams(window.location.hash.substring(1));
+  return {
+    access_token: hash.get('access_token'),
+    refresh_token: hash.get('refresh_token')
+  };
+}

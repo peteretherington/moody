@@ -106,7 +106,7 @@ app.get('/callback', (req, res) => {
     request.post(authOptions, (error, { statusCode }, body) => {
       if (!error && statusCode === 200) {
         const { access_token, refresh_token } = body;
-
+        
         const options = {
           url: 'https://api.spotify.com/v1/me',
           headers: { Authorization: 'Bearer ' + access_token },
